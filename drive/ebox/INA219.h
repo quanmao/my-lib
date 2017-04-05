@@ -1,11 +1,11 @@
 /******************************************************************************
-³Ì Ğò Ãû£º INA219.h¡¡¡¡
-±à Ğ´ ÈË£º 
-±àĞ´Ê±¼ä£º 2017Äê3ÔÂ21ÈÕ
-Ïà¹ØÆ½Ì¨£º STM32F0xx, ebox,cjmcu INA219Ä£¿é¡¡¡¡
-½Ó¿ÚËµÃ÷£º I2C½Ó¿Ú£¬¹©µç3-5v¡£
-ĞŞ¸ÄÈÕÖ¾£º¡¡¡¡
-¡¡¡¡NO.1-  2017Äê3ÔÂ21ÈÕ ÒÆÖ²µ½eboxÆ½Ì¨
+ç¨‹ åº åï¼š INA219.hã€€ã€€
+ç¼– å†™ äººï¼š 
+ç¼–å†™æ—¶é—´ï¼š 2017å¹´3æœˆ21æ—¥
+ç›¸å…³å¹³å°ï¼š STM32F0xx, ebox,cjmcu INA219æ¨¡å—ã€€ã€€
+æ¥å£è¯´æ˜ï¼š I2Cæ¥å£ï¼Œä¾›ç”µ3-5vã€‚
+ä¿®æ”¹æ—¥å¿—ï¼šã€€ã€€
+ã€€ã€€NO.1-  2017å¹´3æœˆ21æ—¥ ç§»æ¤åˆ°eboxå¹³å°
 ******************************************************************************/
 #ifndef __INA219_H
 #define __INA219_H
@@ -14,38 +14,38 @@
 
 /**************************************************************************/
 /*! 
-  ÏÂÃæÒÔ×î´óÁ¿³ÌÎªÀı¼ÆËãINA219Ïà¹Ø²ÎÊı£¬
-  »ù±¾Ìõ¼ş£º
+  ä¸‹é¢ä»¥æœ€å¤§é‡ç¨‹ä¸ºä¾‹è®¡ç®—INA219ç›¸å…³å‚æ•°ï¼Œ
+  åŸºæœ¬æ¡ä»¶ï¼š
   // VBUS_MAX = 32V             (Assumes 32V, can also be set to 16V)
   // VSHUNT_MAX = 0.32          (Assumes Gain 8, 320mV, can also be 160mv, 80mv, 40mv)
   // RSHUNT = 0.1               (Resistor value in ohms)
   
-  // 1. Determine max possible current  È·¶¨×î´ó¿É²âµçÁ÷
+  // 1. Determine max possible current  ç¡®å®šæœ€å¤§å¯æµ‹ç”µæµ
   // MaxPossible_I = VSHUNT_MAX / RSHUNT
   // MaxPossible_I = 3.2A
   
-  // 2. Determine max expected current  ×î´óÔ¤ÆÚµçÁ÷
+  // 2. Determine max expected current  æœ€å¤§é¢„æœŸç”µæµ
   // MaxExpected_I = 2.0A
   
-  // 3. Calculate possible range of LSBs (Min = 15-bit, Max = 12-bit¡£¶ÔÓ¦PGA:1/8,1/4,1/2,1) ¼ÆËã¿ÉÄÜµÄ²ÉÑù¾«¶È
+  // 3. Calculate possible range of LSBs (Min = 15-bit, Max = 12-bitã€‚å¯¹åº”PGA:1/8,1/4,1/2,1) è®¡ç®—å¯èƒ½çš„é‡‡æ ·ç²¾åº¦
   // MinimumLSB = MaxExpected_I/32767
   // MinimumLSB = 0.000061              (61uA per bit)
   // MaximumLSB = MaxExpected_I/4096
   // MaximumLSB = 0,000488              (488uA per bit)
   
-  // 4. Choose an LSB between the min and max values Ñ¡Ôñ²ÉÑù¾«¶È£¬¾¡Á¿Ñ¡ÔñÕûÊı
+  // 4. Choose an LSB between the min and max values é€‰æ‹©é‡‡æ ·ç²¾åº¦ï¼Œå°½é‡é€‰æ‹©æ•´æ•°
   //    (Preferrably a roundish number close to MinLSB)
-  // CurrentLSB = 0.0001 (100uA per bit)  µçÁ÷²ÉÑù¾«¶È
+  // CurrentLSB = 0.0001 (100uA per bit)  ç”µæµé‡‡æ ·ç²¾åº¦
   
-  // 5. Compute the calibration register ¼ÆËãĞ£×¼¼Ä´æÆ÷ÀïµÄĞ£×¼Öµ
+  // 5. Compute the calibration register è®¡ç®—æ ¡å‡†å¯„å­˜å™¨é‡Œçš„æ ¡å‡†å€¼
   // Cal = trunc (0.04096 / (Current_LSB * RSHUNT))
   // Cal = 4096 (0x1000)
   
-  // 6. Calculate the power LSB ¼ÆËã¹¦ÂÊ¾«¶È
+  // 6. Calculate the power LSB è®¡ç®—åŠŸç‡ç²¾åº¦
   // PowerLSB = 20 * CurrentLSB
   // PowerLSB = 0.002 (2mW per bit)
   
-  // 7. Compute the maximum current and shunt voltage values before overflow ¼ÆËã×î´óµçÁ÷ºÍ·ÖÁ÷µçÑ¹
+  // 7. Compute the maximum current and shunt voltage values before overflow è®¡ç®—æœ€å¤§ç”µæµå’Œåˆ†æµç”µå‹
   //
   // Max_Current = Current_LSB * 32767
   // Max_Current = 3.2767A before overflow
@@ -65,15 +65,15 @@
   //    Max_ShuntVoltage_Before_Overflow = Max_ShuntVoltage
   // End If
   
-  // 8. Compute the Maximum Power ¼ÆËã×î´ó¹¦ÂÊ
+  // 8. Compute the Maximum Power è®¡ç®—æœ€å¤§åŠŸç‡
   // MaximumPower = Max_Current_Before_Overflow * VBUS_MAX
   // MaximumPower = 3.2 * 32V
   // MaximumPower = 102.4W
  
-  // 9. Set Calibration register to 'Cal' calculated above	 ÉèÖÃĞ£×¼¼Ä´æÆ÷
+  // 9. Set Calibration register to 'Cal' calculated above	 è®¾ç½®æ ¡å‡†å¯„å­˜å™¨
   WriteRegister(REG_CALIBRATION, _calValue);
   
-  // 10.Set Config register to take into account the settings above ÉèÖÃÅäÖÃ¼Ä´æÆ÷
+  // 10.Set Config register to take into account the settings above è®¾ç½®é…ç½®å¯„å­˜å™¨
   uint16_t config = CONFIG_BVOLTAGERANGE_32V |
                     CONFIG_GAIN_8_320MV |
                     CONFIG_BADCRES_12BIT |
@@ -152,31 +152,31 @@
 /*=========================================================================*/
 
 /*=========================================================================
-    SHUNT VOLTAGE REGISTER (R) ²ÉÑùµç×èÑ¹½µ
+    SHUNT VOLTAGE REGISTER (R) é‡‡æ ·ç”µé˜»å‹é™
     -----------------------------------------------------------------------*/
     #define REG_SHUNTVOLTAGE                (0x01)
 /*=========================================================================*/
 
 /*=========================================================================
-    BUS VOLTAGE REGISTER (R) ×ÜÏßµçÑ¹£¨V- - GND£©
+    BUS VOLTAGE REGISTER (R) æ€»çº¿ç”µå‹ï¼ˆV- - GNDï¼‰
     -----------------------------------------------------------------------*/
     #define REG_BUSVOLTAGE                  (0x02)
 /*=========================================================================*/
 
 /*=========================================================================
-    POWER REGISTER (R) ¹¦ÂÊ
+    POWER REGISTER (R) åŠŸç‡
     -----------------------------------------------------------------------*/
     #define REG_POWER                       (0x03)
 /*=========================================================================*/
 
 /*=========================================================================
-    CURRENT REGISTER (R) µçÁ÷
+    CURRENT REGISTER (R) ç”µæµ
     -----------------------------------------------------------------------*/
     #define REG_CURRENT                     (0x04)
 /*=========================================================================*/
 
 /*=========================================================================
-    CALIBRATION REGISTER (R/W) Ğ£×¼
+    CALIBRATION REGISTER (R/W) æ ¡å‡†
     -----------------------------------------------------------------------*/
     #define REG_CALIBRATION                 (0x05)
 /*=========================================================================*/
@@ -205,12 +205,12 @@ public:
 
 	/**
 		******************************************************************************
-		* @brief  ina219 ÅäÖÃ
-		* @param  range (µçÑ¹·¶Î§)Ä¬ÈÏ0-32v
-		* @param  gain  (ÔöÒæ£¬·ÖÑ¹µç×èµçÑ¹Öµ·¶Î§)Ä¬ÈÏ 1/8 gain  320mv range
-		* @param  bus adc (gnd->bus- µçÑ¹adc)Ä¬ÈÏ  3 12bit, µ¥²ÉÑù£¬532us×ª»»Ê±¼ä
-		* @param  shunt adc (²ÉÑùµç×è µçÑ¹adc)Ä¬ÈÏ  3 12bit, µ¥²ÉÑù£¬532us×ª»»Ê±¼ä
-		* @param  mode (Ä£Ê½) Ä¬ÈÏ 7 £¬Á¬Ğø×ª»»
+		* @brief  ina219 é…ç½®
+		* @param  range (ç”µå‹èŒƒå›´)é»˜è®¤0-32v
+		* @param  gain  (å¢ç›Šï¼Œåˆ†å‹ç”µé˜»ç”µå‹å€¼èŒƒå›´)é»˜è®¤ 1/8 gain  320mv range
+		* @param  bus adc (gnd->bus- ç”µå‹adc)é»˜è®¤  3 12bit, å•é‡‡æ ·ï¼Œ532usè½¬æ¢æ—¶é—´
+		* @param  shunt adc (é‡‡æ ·ç”µé˜» ç”µå‹adc)é»˜è®¤  3 12bit, å•é‡‡æ ·ï¼Œ532usè½¬æ¢æ—¶é—´
+		* @param  mode (æ¨¡å¼) é»˜è®¤ 7 ï¼Œè¿ç»­è½¬æ¢
 		* @note   
 		* @retval none
 		******************************************************************************
@@ -223,13 +223,13 @@ public:
 	
 
 private:
-	E_I2c 	*_i2c;			// i2c¶Ë¿Ú
-	uint8_t  _addr; 		// Éè±¸µØÖ·
-	uint32_t _calValue;		// Ğ£×¼Öµ
-	uint8_t  _state; 		// ×ª»»×´Ì¬
+	E_I2c 	*_i2c;			// i2cç«¯å£
+	uint8_t  _addr; 		// è®¾å¤‡åœ°å€
+	uint32_t _calValue;		// æ ¡å‡†å€¼
+	uint8_t  _state; 		// è½¬æ¢çŠ¶æ€
 	
-	int _currentLSB;	// µçÁ÷·Ö±æÂÊ
-	int _powerLSB;		// ¹¦ÂÊ·Ö±æÂÊ
+	int _currentLSB;	// ç”µæµåˆ†è¾¨ç‡
+	int _powerLSB;		// åŠŸç‡åˆ†è¾¨ç‡
 
 	void WriteRegister(uint8_t reg, uint16_t value);
 	void ReadRegister(uint8_t reg, uint16_t *value);
