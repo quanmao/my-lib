@@ -3,7 +3,7 @@ file   : encoder-EXTI.cpp
 author : cat_li
 version: V1.1
 date   : 2015/11/10
-         2016/04/10 ĞŞ¸´Êä³ö¼üÖµ²»ÎÈ¶¨£¬¼ÓÈëË«ÖĞ¶ÏÄ£Ê½£¬Ìí¼ÓÖĞ¶Ï¶ÁÖµËµÃ÷
+         2016/04/10 ä¿®å¤è¾“å‡ºé”®å€¼ä¸ç¨³å®šï¼ŒåŠ å…¥åŒä¸­æ–­æ¨¡å¼ï¼Œæ·»åŠ ä¸­æ–­è¯»å€¼è¯´æ˜
 
 Copyright 2015 cat_li. All Rights Reserved.
 
@@ -22,7 +22,7 @@ This specification is preliminary and is subject to change at any time without n
 #define KEY_A		1
 #define	KEY_B		2
 
-// Ä¬ÈÏÎªµ¥ÖĞ¶Ï£¬¹»ÓÃÁË ĞèÒªË«ÖĞ¶ÏÈ¥µôÏÂÃæµÄ×¢ÊÍ
+// é»˜è®¤ä¸ºå•ä¸­æ–­ï¼Œå¤Ÿç”¨äº† éœ€è¦åŒä¸­æ–­å»æ‰ä¸‹é¢çš„æ³¨é‡Š
 //#define	DUAL_INTERRUPT	1
 
 class ENCODER
